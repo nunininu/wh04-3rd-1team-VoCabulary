@@ -1,6 +1,12 @@
 # ☎️ 고객 상담 이력 자동 분석 서비스 
-> LG U+ Whynotsw-camp 4기 3차 프로젝트
+> **LG U+ Whynotsw-camp 4기 3차 프로젝트**
 ---
+**Git Repo URL**
+- 로컬-NLP: https://github.com/nunininu/VoC-local
+- 인스턴스1-API: https://github.com/nunininu/VoC-instance1
+- 인스턴스2-Airflow:  https://github.com/nunininu/VoC-instance2
+- 인스턴스3-Superset: https://github.com/nunininu/VoC-instance3
+
 
 # Team VoCabulary
 ### 👩‍✈🤵🤵🤵 팀원 소개
