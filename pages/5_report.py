@@ -1,121 +1,113 @@
-# report.py 
+# ✅ report.py
+
 import streamlit as st
-from datetime import datetime, timedelta
 from db_utils import (
-    fetch_consultings_by_day,
-    calculate_negative_stats,
-    fetch_consulting_detail,
-    get_top_categories,
-    get_top_keywords,
-    get_daily_trend
-)   
+    fetch_report_data,
+    fetch_consultings_by_range,
+    get_top_negative_reasons
+)
 import plotly.express as px
+import pandas as pd
+from datetime import datetime, timedelta
 
 st.set_page_config(page_title="일일 리포트", layout="wide")
 st.title("📊 VOC 일일 리포트")
 
-# 날짜 기준 설정 (오늘 = 기준일, 어제/그제 비교)
-today = datetime.today().date()
+# ✅ 현재 시간 기준 설명 표시
+now = datetime.now()
+time_str = now.strftime("%H:%M")
+today = now.date()
 yesterday = today - timedelta(days=1)
+day_before_yesterday = today - timedelta(days=2)
 
-# 문의 수
-df_today = fetch_consultings_by_day(today)
-df_yesterday = fetch_consultings_by_day(yesterday)
+st.info(f"""
+ℹ️ 기준 시간: **{now.strftime('%Y-%m-%d %H:%M:%S')} 기준**
 
-count_t = len(df_today)
-count_y = len(df_yesterday)
-diff = count_t - count_y
+- 오늘: **{yesterday.strftime('%Y-%m-%d')} {time_str}** 부터 **{now.strftime('%Y-%m-%d %H:%M')}** 까지  
+- 어제: **{day_before_yesterday.strftime('%Y-%m-%d')} {time_str}** 부터 **{yesterday.strftime('%Y-%m-%d')} {time_str}** 까지
+""")
 
-st.markdown("---")
+# ✅ /report API 데이터 호출
+report = fetch_report_data()
+
+# ✅ 문의 수 요약
+cnt_y = report.get("consulting_cnt", {}).get("consulting_cnt_yesterday", 0)
+cnt_t = report.get("consulting_cnt", {}).get("consulting_cnt_today", 0)
+diff = cnt_t - cnt_y
 
 st.subheader("📌 문의 수 요약")
 col1, col2 = st.columns(2)
-with col1:
-    st.metric(label=str(yesterday), value=f"{count_y}건")
-with col2:
-    st.metric(label=str(today), value=f"{count_t}건", delta=f"{diff:+}건")
-
+col1.metric("어제", f"{cnt_y}건")
+col2.metric("오늘", f"{cnt_t}건", delta=f"{diff:+}건")
 st.markdown("---")
 
-# 부정 응답률
-neg_count_t, neg_rate_t = calculate_negative_stats(df_today["consulting_id"])
-neg_count_y, neg_rate_y = calculate_negative_stats(df_yesterday["consulting_id"])
+# ✅ 불만 응답 건수
+neg_y = report.get("negative_cnt", {}).get("negative_cnt_yesterday", 0)
+neg_t = report.get("negative_cnt", {}).get("negative_cnt_today", 0)
+diff_n = neg_t - neg_y
 
-st.subheader("😡 부정 응답률")
-st.markdown(f"- 어제 부정 응답 건수: **{neg_count_y}건** ({neg_rate_y})")
-st.markdown(f"- 오늘 부정 응답 건수: **{neg_count_t}건** ({neg_rate_t})")
-
+st.subheader("😡 불만 응답 건수")
+col1, col2 = st.columns(2)
+col1.metric("어제", f"{neg_y}건")
+col2.metric("오늘", f"{neg_t}건", delta=f"{diff_n:+}건")
 st.markdown("---")
 
-st.subheader("😥 고객 불만 내용 모아보기")
+# ✅ 상담 데이터 전체 조회 (2일치)
+all_data = fetch_consultings_by_range(day_before_yesterday, today)
+df_today = all_data[all_data["consulting_datetime"].dt.date == today]
+df_yesterday = all_data[all_data["consulting_datetime"].dt.date == yesterday]
 
-neg_texts = []
-
-for cid in df_yesterday["consulting_id"]:
-    try:
-        detail = fetch_consulting_detail(cid)
-        if not detail.empty and detail["negative"].iloc[0] > 0.6:
-            neg_texts.append({
-                "cid": cid,
-                "client_name": detail["client_name"].iloc[0],
-                "negative": detail["negative"].iloc[0]
-            })
-    except:
-        continue
-
-if not neg_texts:
-    st.info("부정도가 높은 상담이 없습니다.")
+# ✅ 불만 키워드 TOP 3
+st.subheader("🧨 불만 사유 TOP 3")
+if not df_yesterday.empty:
+    reasons = get_top_negative_reasons(df_yesterday["consulting_id"])
+    if reasons.empty:
+        st.info("불만 사유 데이터가 없습니다.")
+    else:
+        st.dataframe(reasons, use_container_width=True, hide_index=True)
 else:
-    # ✅ 헤더
-    header_cols = st.columns([3, 2, 2, 2])
-    headers = ["상담ID", "고객명", "부정도", "상세보기"]
-    for col, title in zip(header_cols, headers):
-        col.markdown(f"**{title}**")
+    st.info("어제 상담 데이터가 없습니다.")
+st.markdown("---")
 
-    # ✅ 내용 행
-    for i, item in enumerate(neg_texts):
-        row_cols = st.columns([3, 2, 2, 2])
-        row_cols[0].markdown(f"`{item['cid']}`")
-        row_cols[1].markdown(f"**{item['client_name']}**")
-        row_cols[2].markdown(f"{item['negative']:.2f}")
-        if row_cols[3].button("➡ 결과 상세보기", key=f"btn_neg_detail_{item['cid']}_{i}"):
-            st.session_state["consulting_id"] = item["cid"]
-            st.switch_page("pages/3_consulting_detail.py")
+# ✅ 연령대별 불만 응답 요약
+# ✅ 현재 시각 기준 설정
+now = datetime.now()
+time_str = now.strftime('%H:%M')
+today = now.date()
+yesterday = today - timedelta(days=1)
 
-        st.markdown("---")
+# ✅ 오늘 분석 범위: 어제 같은 시각 ~ 지금
+start_time = datetime.combine(yesterday, now.time())
+end_time = now
 
-# 상담 추이 그래프
-st.subheader("📈 날짜별 상담 추이 그래프")
-daily = get_daily_trend()
-fig = px.line(daily, x="date", y="total", markers=True)
-st.plotly_chart(fig, use_container_width=True)
+# ✅ 연령대별 불만 응답 분석
 
 st.markdown("---")
 
-# 카테고리 
+# ✅ 카테고리 TOP 5
 st.subheader("🏆 카테고리 TOP 5")
-top_cat = get_top_categories(df_yesterday)
-if top_cat.empty or top_cat.shape[0] == 0:
+cat_data = report.get("top_categories", [])
+if not cat_data:
     st.info("카테고리 정보가 없습니다.")
 else:
-    top_cat = top_cat.rename(columns={"개수": "건수"})
-    top_cat["순위"] = range(1, len(top_cat) + 1)    
-    top_cat = top_cat[["순위", "카테고리", "건수"]]
-    st.dataframe(top_cat.reset_index(drop=True), use_container_width=True, hide_index=True)
-
+    df = pd.DataFrame(cat_data)
+    df = df.rename(columns={"category_name": "카테고리", "cnt": "건수"})
+    df["순위"] = range(1, len(df) + 1)
+    df = df[["순위", "카테고리", "건수"]]
+    st.dataframe(df, use_container_width=True, hide_index=True)
 st.markdown("---")
 
-# 키워드
+# ✅ 키워드 TOP 5
 st.subheader("🔑 키워드 TOP 5")
-top_kw = get_top_keywords(df_yesterday["consulting_id"])
-if top_kw.empty or top_kw.shape[0] == 0:
-    st.info("키워드 데이터가 없습니다.")
+kw_data = report.get("top_keywords", [])
+if not kw_data:
+    st.info("키워드 정보가 없습니다.")
 else:
-    top_kw = top_kw.rename(columns={"개수": "건수"})
-    top_kw["순위"] = range(1, len(top_kw) + 1)
-    top_kw = top_kw[["순위", "키워드", "건수"]]
-    st.dataframe(top_kw.reset_index(drop=True), use_container_width=True, hide_index=True)
-
+    df = pd.DataFrame(kw_data)
+    df = df.rename(columns={"keyword": "키워드", "cnt": "건수"})
+    df["순위"] = range(1, len(df) + 1)
+    df = df[["순위", "키워드", "건수"]]
+    st.dataframe(df, use_container_width=True, hide_index=True)
 st.markdown("---")
 
 # ✅ 푸터
@@ -123,3 +115,6 @@ st.markdown("""
 <hr style='margin-top:2rem;margin-bottom:1rem;'>
 <p style='text-align:center;color:gray;'>© 2025 VOC - 고객 인사이트를 향한 첫걸음</p>
 """, unsafe_allow_html=True)
+
+
+

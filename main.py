@@ -2,14 +2,14 @@ import streamlit as st
 import pandas as pd
 from db_utils import fetch_recent_consulting, fetch_consulting_by_id, load_category_from_api, filter_consultings
 
-st.set_page_config(page_title="VOC 고객상담 분석 서비스", layout="wide")
+st.set_page_config(page_title="VoC 고객상담 분석 서비스", layout="wide")
 
 # ✅ 서비스 요약
 st.markdown("""
 <div style='text-align:center;'>
-    <h1 style='color:#003366;'>🎯 VOC 고객상담 분석 서비스</h1>
+    <h1 style='color:#003366;'>🎯 VoC 고객상담 분석 서비스</h1>
     <p>고객 상담 데이터를 분석하여 운영 인사이트를 제공하는 실무 중심의 분석 도구입니다.</p>
-    <p><b>📌 주요 기능:</b> 실시간 상담 트렌드 분석, 감정 및 키워드 시각화, 고객 이력 확인, 리포트 생성 등</p>
+    <p><b>📌 주요 기능:</b> 실시간 상담 내역, 고객 이력 확인, 감정 및 키워드 분석, 일일 리포트 생성 등</p>
 </div>
 """, unsafe_allow_html=True)
 
