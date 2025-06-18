@@ -1,0 +1,15 @@
+[project]
+name = "wh04-3rd-1team-VoCabulary"
+version = "0.1.0"
+description = "Default template for PDM package"
+authors = [
+    {name = "lucas_hub12", email = "hyeonggyunbae@gmail.com"},
+]
+dependencies = ["streamlit>=1.45.1", "plotly>=6.1.0", "wordcloud>=1.9.4", "streamlit-extras>=0.7.1", "psycopg2-binary>=2.9.10", "python-dotenv>=1.1.0", "pytz>=2025.2"]
+requires-python = "==3.12.*"
+readme = "README.md"
+license = {text = "MIT"}
+
+
+[tool.pdm]
+distribution = false
