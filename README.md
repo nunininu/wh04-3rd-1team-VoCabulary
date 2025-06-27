@@ -17,7 +17,7 @@
 |---|---|---|---|
 |<img src="https://avatars.githubusercontent.com/u/75382687?v=4" width="100">|<img src="https://avatars.githubusercontent.com/u/194044481?v=4" width="100">|<img src="https://avatars.githubusercontent.com/u/192968662?v=4" width="100">|<img src="https://avatars.githubusercontent.com/u/194044625?v=4" width="100">|
 |테크 리더|프로젝트 리더|형상 관리자|애자일 코치|
-|백엔드<br>인프라 설계 및 구축<br>데이터 파이프라인|데이터 분석<br>데이터 수집 및 가공<br>NLP 서버|대시보드<br>데이터 분석 및 시각화<br>Github 관리|시각화<br>UI/UX 설계<br>스크럼 및 미팅 관리|
+|백엔드<br>인프라 설계 및 구축<br>데이터 파이프라인|데이터 분석<br>데이터 수집 및 가공<br>NLP 서버|대시보드<br>데이터 분석 및 시각화<br>Github, 산출물 관리|시각화<br>UI/UX 설계<br>스크럼 및 미팅 관리|
 
 # 🎥 Preview
 
