@@ -19,6 +19,12 @@
 |테크 리더|프로젝트 리더|형상 관리자|애자일 코치|
 |백엔드<br>인프라 설계 및 구축<br>데이터 파이프라인|데이터 분석<br>데이터 수집 및 가공<br>NLP 서버|대시보드<br>데이터 분석 및 시각화<br>Github 관리|시각화<br>UI/UX 설계<br>스크럼 및 미팅 관리|
 
+# 🎥 Preview
+
+https://github.com/user-attachments/assets/aaf54b46-50b6-409f-ae36-d6f50d554b59
+
+
+
 <br>
 
 ## 🛠 기술 스택
@@ -37,6 +43,13 @@
 ### Visualization
 ![Streamlit](https://img.shields.io/badge/Streamlit-%23FE4B4B.svg?style=&logo=streamlit&logoColor=white) ![Superset](https://img.shields.io/badge/Superset-375BD2?style=&logo=Superset&logoColor=white)
 
+<br>
+
+## 🌐 서비스 아키텍처
+![Image](https://github.com/user-attachments/assets/73beccdf-4ee1-410a-8500-e604064d7ca5)
+
+## 〰️ 데이터 파이프라인
+![Image](https://github.com/user-attachments/assets/14fe9246-e351-4a6a-a619-29824e69f6e7)
 
 <br>
 
